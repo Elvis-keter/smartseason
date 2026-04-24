@@ -1,88 +1,61 @@
+import sqlite3 from 'sqlite3';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const db = new sqlite3.Database('./db/crops.db', (err) => {
+  if (err) {
+    console.error('Error opening database:', err);
+  }
+});
+
+// Promise wrapper for db.all
+export const dbAll = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows || []);
+    });
+  });
+};
+
+// Promise wrapper for db.get
+export const dbGet = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+};
+
+// Promise wrapper for db.run
+export const dbRun = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function(err) {
+      if (err) reject(err);
+      else resolve(this);
+    });
+  });
+};
+
+
 // import pg from 'pg';
-// import dotenv from 'dotenv';
-
-// dotenv.config();
-
 // const { Pool } = pg;
 
-// const isProduction = process.env.NODE_ENV === 'production';
-
-// let db;
-
-// if (isProduction) {
-//   // Use PostgreSQL in production
-//   db = new Pool({
-//     connectionString: process.env.DATABASE_URL,
-//     ssl: { rejectUnauthorized: false }
-//   });
-
-//   db.on('error', (err) => {
-//     console.error('Unexpected error on idle client', err);
-//     process.exit(-1);
-//   });
-// } else {
-//   // Use SQLite in development
-//   import('sqlite3').then(({ default: sqlite3 }) => {
-//     db = new sqlite3.Database('./db/crops.db');
-//   });
-// }
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+// });
 
 // export const dbAll = (sql, params = []) => {
-//   return new Promise((resolve, reject) => {
-//     if (isProduction) {
-//       db.query(sql, params).then(res => resolve(res.rows || [])).catch(reject);
-//     } else {
-//       db.all(sql, params, (err, rows) => {
-//         if (err) reject(err);
-//         else resolve(rows || []);
-//       });
-//     }
-//   });
+//   return pool.query(sql, params).then(res => res.rows);
 // };
 
 // export const dbGet = (sql, params = []) => {
-//   return new Promise((resolve, reject) => {
-//     if (isProduction) {
-//       db.query(sql, params).then(res => resolve(res.rows[0])).catch(reject);
-//     } else {
-//       db.get(sql, params, (err, row) => {
-//         if (err) reject(err);
-//         else resolve(row);
-//       });
-//     }
-//   });
+//   return pool.query(sql, params).then(res => res.rows[0]);
 // };
 
 // export const dbRun = (sql, params = []) => {
-//   return new Promise((resolve, reject) => {
-//     if (isProduction) {
-//       db.query(sql, params).then(resolve).catch(reject);
-//     } else {
-//       db.run(sql, params, function(err) {
-//         if (err) reject(err);
-//         else resolve(this);
-//       });
-//     }
-//   });
+//   return pool.query(sql, params);
 // };
-
-
-import pg from 'pg';
-const { Pool } = pg;
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
-
-export const dbAll = (sql, params = []) => {
-  return pool.query(sql, params).then(res => res.rows);
-};
-
-export const dbGet = (sql, params = []) => {
-  return pool.query(sql, params).then(res => res.rows[0]);
-};
-
-export const dbRun = (sql, params = []) => {
-  return pool.query(sql, params);
-};
