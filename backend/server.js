@@ -11,8 +11,6 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   'https://moonlit-blancmange-da1963.netlify.app',
   'https://smart-season-lake.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5173'
 ];
 
 // Middleware
@@ -21,7 +19,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(null, true); // Allow requests without origin header (mobile apps, curl, etc)
+      callback(null, true); 
     }
   },
   credentials: true,
